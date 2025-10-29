@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Newspaper, Loader2, RefreshCw, Sun, Moon } from 'lucide-react';
 
-const CATEGORIES = ['general', 'business', 'technology', 'health', 'science', 'sports', 'entertainment'];
+const CATEGORIES = ['world', 'business', 'technology', 'health', 'science', 'sports', 'entertainment', 'lifestyle'];
 
 const CategorySelector = ({ selectedCategory, onSelect }) => {
   return (
@@ -20,8 +20,8 @@ const CategorySelector = ({ selectedCategory, onSelect }) => {
 };
 
 const NewsCard = ({ article }) => {
-  const imageUrl = article.urlToImage || `https://placehold.co/600x400/6b7280/ffffff?text=Image+Unavailable`;
-  const publishedDate = new Date(article.publishedAt).toLocaleDateString();
+  const imageUrl = article.image_url || `https://placehold.co/600x400/6b7280/ffffff?text=Image+Unavailable`;
+  const publishedDate = new Date(article.pubDate).toLocaleDateString();
 
   return (
     <div className="news-card">
@@ -42,11 +42,11 @@ const NewsCard = ({ article }) => {
           {article.description || "No description available."}
         </p>
         <div className="news-card-meta">
-          <span className="news-card-source">{article.source.name}</span>
+          <span className="news-card-source">{article.source_id || article.creator || 'Unknown Source'}</span>
           <span className="news-card-date">{publishedDate}</span>
         </div>
         <a
-          href={article.url}
+          href={article.link}
           target="_blank"
           rel="noopener noreferrer"
           className="news-card-link"
@@ -65,14 +65,14 @@ const App = () => {
   const [category, setCategory] = useState('technology');
   const [theme, setTheme] = useState('light');
 
-  const NEWS_API_KEY = "26968f89a20945049a6e7e1d46d6d432";
+  const NEWSDATA_API_KEY = "pub_aca3a21bab5d4fd3bdcaa75eaa923a95";
 
   const fetchNews = useCallback(async (selectedCategory) => {
     setLoading(true);
     setError(null);
     setArticles([]);
 
-    const API_URL = `https://newsapi.org/v2/top-headlines?country=us&category=${selectedCategory}&apiKey=${NEWS_API_KEY}`;
+    const API_URL = `https://newsdata.io/api/1/news?apikey=${NEWSDATA_API_KEY}&country=us&category=${selectedCategory}`;
 
     try {
       const response = await fetch(API_URL);
@@ -83,7 +83,13 @@ const App = () => {
       }
 
       const data = await response.json();
-      setArticles(data.articles || []);
+      
+      if (data.status === 'success' && data.results) {
+        setArticles(data.results.filter(a => a.title && a.link));
+      } else {
+        const errorMessage = data.message || "Failed to fetch articles from Newsdata.io.";
+        throw new Error(errorMessage);
+      }
 
     } catch (err) {
       console.error("Fetching error:", err);
@@ -91,7 +97,7 @@ const App = () => {
     } finally {
       setLoading(false);
     }
-  }, [NEWS_API_KEY]);
+  }, [NEWSDATA_API_KEY]);
 
   const handleCategoryChange = useCallback((newCategory) => {
     setCategory(newCategory);
@@ -129,13 +135,9 @@ const App = () => {
               className={`refresh-button ${loading ? 'refresh-button-loading' : ''}`}
             >
               {loading ? (
-                  <>
-                    <Loader2 className="loading-spinner" />
-                  </>
+                <Loader2 className="loading-spinner" />
               ) : (
-                  <>
-                    <RefreshCw className="refresh-icon" />
-                  </>
+                <RefreshCw className="refresh-icon" />
               )}
             </button>
           </div>
@@ -160,7 +162,7 @@ const App = () => {
               <h2 className="error-title">Error</h2>
               <p className='error-details'>{error}</p>
               <p className="error-note">
-                  There's Some Error fetching the news.
+                There's Some Error fetching the news.
               </p>
             </div>
           )}
