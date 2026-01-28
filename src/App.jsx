@@ -201,7 +201,7 @@ const App = () => {
 
                     {!loading && displayedArticles.length === 0 && (
                         <div className="no-results">
-                            <p>No articles found here. {showBookmarks ? "Try saving some first!" : "Try refreshing."}</p>
+                            <p>No articles found here! {showBookmarks ? "Try saving some first!" : "Try refreshing."}</p>
                         </div>
                     )}
                 </main>
