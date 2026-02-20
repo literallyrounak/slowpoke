@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/slowpoke/static/css/main.b2ebf949.css",
+    "main.js": "/slowpoke/static/js/main.58e28e27.js",
+    "index.html": "/slowpoke/index.html",
+    "main.b2ebf949.css.map": "/slowpoke/static/css/main.b2ebf949.css.map",
+    "main.58e28e27.js.map": "/slowpoke/static/js/main.58e28e27.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b2ebf949.css",
+    "static/js/main.58e28e27.js"
+  ]
+}
